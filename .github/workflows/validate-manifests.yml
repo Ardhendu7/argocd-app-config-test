@@ -1,0 +1,26 @@
+name: Validate Kubernetes manifests
+
+on:
+  pull_request:
+    paths:
+      - "dev/**"
+      - ".github/workflows/validate-manifests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "dev/**"
+      - ".github/workflows/validate-manifests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+      - run: go install github.com/yannh/kubeconform/cmd/kubeconform@v0.6.7
+      - run: kubeconform -strict -summary dev/
